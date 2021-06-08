@@ -1,0 +1,79 @@
+---
+title: "Lecture 10: Law of Large Numbers"
+output: 
+  learnr::tutorial:
+    css: css/styles.css
+runtime: shiny_prerendered
+---
+
+
+```{r setup, include=FALSE}
+library(learnr)
+library(tidyverse)
+library(ggplot2)
+library(kableExtra)
+```
+
+
+## Law of Large Numbers
+
+### Normal Distribution
+
+Simulate 1,000 samples of $X\sim N(0,1)$.
+
+
+#### Population vs. Sample Distribution
+
+Plot histograms for the first 10, 100, and 1000 samples. Fix the x-axis range to -5 to 5.
+
+```{r hist1, exercise=TRUE, exercise.lines=5}
+x <- rnorm(1000)
+```
+
+Compare them to the histograms from lecture slides (Example: Average Samples). 
+
+#### Law of Large Numbers
+
+b) Compute
+
+$$\overline{X}_n=\frac{1}{n}\sum_{i=1}^n X_i$$
+
+for $n=1,2,\dots,1000$ and plot them as points along y-axis with $n$ on x-axis.
+
+
+```{r trace1, exercise=TRUE, exercise.lines=5}
+x <- rnorm(1000)
+```
+
+### Other Distributions
+
+Repeat the exercise with $X\sim\text{Pois}(3)$ and $Y\sim\text{Exp}(0.5)$.
+
+```{r free, exercise=TRUE, exercise.lines=25}
+```
+
+## Tutorial Activity 5 
+
+For part a), you get 
+
+$$F_Y(a) = c_1 y^2 + \frac{c_2}{y} + c_3$$
+
+where $c_i$ are some constants. (You should be able to get what the constants are.) Given the cdf of $Y$, generating random samples of $Y$ involves solving
+
+$$U = c_1 Y^2 + \frac{c_2}{Y} + c_3$$
+
+for $Y$, which leads to
+
+$$c_1 Y^3 +\left(c_3 -U\right)Y+c_2 = 0.$$
+
+The analytical solution for the equation isn't immediately obvious. We can try solving it numerically using R's built-in root finding function, `uniroot`. (If you wish to solve it analytically, you can look up _cubic formula_, but it is not required for the course.)
+
+```{r numric, exercise=TRUE, exercise.lines=15}
+# for demonstration purpose
+c1 <- 1; c2 <- 1; c3 <- 1
+# for a single value of U
+u <- 5
+Fy <- function(y, u) c1 * y^3  + (c3 - u) * y + c2
+uniroot(f = Fy, interval = c(1, 4), u = u)
+# for n sequence values of u
+```
