@@ -17,63 +17,40 @@ library(kableExtra)
 
 ## Law of Large Numbers
 
-### Normal Distribution
+TO BE UPDATED
 
-Simulate 1,000 samples of $X\sim N(0,1)$.
+<!-- ### Normal Distribution -->
 
-
-#### Population vs. Sample Distribution
-
-Plot histograms for the first 10, 100, and 1000 samples. Fix the x-axis range to -5 to 5.
-
-```{r hist1, exercise=TRUE, exercise.lines=5}
-x <- rnorm(1000)
-```
-
-Compare them to the histograms from lecture slides (Example: Average Samples). 
-
-#### Law of Large Numbers
-
-b) Compute
-
-$$\overline{X}_n=\frac{1}{n}\sum_{i=1}^n X_i$$
-
-for $n=1,2,\dots,1000$ and plot them as points along y-axis with $n$ on x-axis.
+<!-- Simulate 1,000 samples of $X\sim N(0,1)$. -->
 
 
-```{r trace1, exercise=TRUE, exercise.lines=5}
-x <- rnorm(1000)
-```
+<!-- #### Population vs. Sample Distribution -->
 
-### Other Distributions
+<!-- Plot histograms for the first 10, 100, and 1000 samples. Fix the x-axis range to -5 to 5. -->
 
-Repeat the exercise with $X\sim\text{Pois}(3)$ and $Y\sim\text{Exp}(0.5)$.
+<!-- ```{r hist1, exercise=TRUE, exercise.lines=5} -->
+<!-- x <- rnorm(1000) -->
+<!-- ``` -->
 
-```{r free, exercise=TRUE, exercise.lines=25}
-```
+<!-- Compare them to the histograms from lecture slides (Example: Average Samples).  -->
 
-## Tutorial Activity 5 
+<!-- #### Law of Large Numbers -->
 
-For part a), you get 
+<!-- b) Compute -->
 
-$$F_Y(a) = c_1 y^2 + \frac{c_2}{y} + c_3$$
+<!-- $$\overline{X}_n=\frac{1}{n}\sum_{i=1}^n X_i$$ -->
 
-where $c_i$ are some constants. (You should be able to get what the constants are.) Given the cdf of $Y$, generating random samples of $Y$ involves solving
+<!-- for $n=1,2,\dots,1000$ and plot them as points along y-axis with $n$ on x-axis. -->
 
-$$U = c_1 Y^2 + \frac{c_2}{Y} + c_3$$
 
-for $Y$, which leads to
+<!-- ```{r trace1, exercise=TRUE, exercise.lines=5} -->
+<!-- x <- rnorm(1000) -->
+<!-- ``` -->
 
-$$c_1 Y^3 +\left(c_3 -U\right)Y+c_2 = 0.$$
+<!-- ### Other Distributions -->
 
-The analytical solution for the equation isn't immediately obvious. We can try solving it numerically using R's built-in root finding function, `uniroot`. (If you wish to solve it analytically, you can look up _cubic formula_, but it is not required for the course.)
+<!-- Repeat the exercise with $X\sim\text{Pois}(3)$ and $Y\sim\text{Exp}(0.5)$. -->
 
-```{r numric, exercise=TRUE, exercise.lines=15}
-# for demonstration purpose
-c1 <- 1; c2 <- 1; c3 <- 1
-# for a single value of U
-u <- 5
-Fy <- function(y, u) c1 * y^3  + (c3 - u) * y + c2
-uniroot(f = Fy, interval = c(1, 4), u = u)
-# for n sequence values of u
-```
+<!-- ```{r free, exercise=TRUE, exercise.lines=25} -->
+<!-- ``` -->
+
