@@ -1,0 +1,302 @@
+---
+title: "Lecture 10: Law of Large Numbers"
+output: 
+  learnr::tutorial:
+    css: css/styles.css
+runtime: shiny_prerendered
+---
+
+
+```{r setup, include=FALSE}
+library(learnr)
+library(tidyverse)
+set.seed(237)
+```
+
+## R prepartion
+
+### `ggplot` and colours
+
+`ggplot2` allows users to easily customize the visual properties of the plots
+including the colours. You can assign colours to `fill` and `color` arguments
+inside the functions adding the geometry objects - e.g., `geom_point()`, `geom_line()`, etc.
+and annotations.
+
+We have practiced using color in Weekly Activity 3.
+
+
+```{r}
+library(ggplot2)
+set.seed(123)
+N <- 101
+theta <- 1/4
+sims <- data.frame(
+  index = seq_len(N),
+  value = sort(rgeom(N, theta) + 1)
+)
+# Here, I am using a data frame inside ggplot()
+sims_base <- ggplot(sims, aes(x = index, y = value)) +
+  theme_classic() +
+  labs(x = "Cumulative count", y = "Simulated value") +
+  scale_x_continuous(breaks = c(1, 26, 51, 76, 101)) +
+  scale_y_continuous(
+    breaks = c(range(sims$value), median(sims$value), 1 / theta)
+  )
+sims_base +
+  geom_segment(aes(xend = index, yend = 1 / theta), 
+               color = "darkgrey", linewidth = 1) +
+  geom_point(size = 2)  +
+  geom_hline(yintercept = 1 / theta, linetype = "solid", 
+             linewidth = 2, color = "navy") +
+  geom_hline(yintercept = mean(sims$value), linetype = "dashed", 
+             linewidth = 1, color = "orange") +
+  annotate("segment", x = 51, xend = 51, y = 1, yend = sims$value[51],
+           linetype = "dotted", color = "red", linewidth = 1) +
+  annotate("segment", x = 0, xend = 51, y = sims$value[51], yend = sims$value[51],
+           linetype = "dotted", color = "red", linewidth = 1) +
+  annotate("text", x = c(1, 30, 52), y = c(4.5, 4.5, 3), 
+           label = c("Simulated mean", "E[G]", "Simulated median"),
+           vjust = c(0, 0, 1.5), hjust = 0, color = c("navy", "orange", "red"))
+```
+
+`ggplot2` also allows you to map data values to colors of geometry objects. You
+can define the mappings inside `aes()` calls. The example below colors the line
+segments and points based on whether the `value` is less than `1 / theta` or not.
+
+```{r}
+sims_base +
+  geom_segment(aes(xend = index, yend = 1 / theta,
+                   color = value < (1 / theta))) +
+  geom_point(aes(color = value < 1 / theta), size = 2)
+```
+
+`ggplot2` uses a set of default colours and creates a legend. To control the
+specific colours mapped to data values and the legend, you can use the
+family of `scale_colour_*()` functions. For example, we can set the name to be
+blank and use descriptive labels for the legend keys.
+
+
+```{r}
+sims_base +
+  geom_segment(aes(xend = index, yend = 1 / theta,
+                   color = value < (1 / theta))) +
+  geom_point(aes(color = value < 1 / theta), size = 2) +
+  scale_colour_discrete(name = "", labels = c("Above mean", "Below mean"))
+```
+
+> We used `scale_colour_discrete()` because the mapped data is of type logical and
+`ggplot2` considers data types logical and characters as "discrete". Numerics are considered
+as "continuous". They are based on data types coded in R and may be different from 
+the context. e.g., a count may be coded as a "continuous" data type. We will look at
+the case of "discrete" data types.
+
+There are a few options to control the specific colours mapped to data.
+
++  `scale_colour_manual()` allows you to map a specific colour to each value
+manually using `values` argument. Common colour names such as "black", "orange",
+etc. are accepted or you can use [Hex color codes](https://www.color-hex.com).
+
+```{r}
+sims_base +
+  geom_segment(aes(xend = index, yend = 1 / theta,
+                   color = value < (1 / theta))) +
+  geom_point(aes(color = value < 1 / theta), size = 2) +
+  scale_colour_manual(
+    # map colours to values
+    values = c(`TRUE` = "orange", `FALSE` = "grey"),
+    name = "", labels = c("Above mean", "Below mean"),
+  )
+```
+
+
++  `scale_colour_brewer()` allows you to use preset colour schemes from
+[ColorBrewer](https://colorbrewer2.org). You can select a colour scheme by type 
+(`type = "div"` for diverging colour scheme) or by a specific name (`palette = "Pastel1"`).
+
+```{r}
+sims_base +
+  geom_segment(aes(xend = index, yend = 1 / theta,
+                   color = value < (1 / theta))) +
+  geom_point(aes(color = value < 1 / theta), size = 2) +
+  scale_colour_brewer(
+    type = "div", # select a diverging colour scheme
+    name = "", labels = c("Above mean", "Below mean"),
+  )
+```
+
+```{r}
+sims_base +
+  geom_segment(aes(xend = index, yend = 1 / theta,
+                   color = value < (1 / theta))) +
+  geom_point(aes(color = value < 1 / theta), size = 2) +
+  scale_colour_brewer(
+    palette = "Pastel1", # select a diverging colour scheme
+    name = "", labels = c("Above mean", "Below mean"),
+  )
+```
+
++  `scale_viridis_d()` provides preset colour schemes called [viridis](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html).
+They are designed to be easy on the eay and colour-blind friendly.
+
+```{r}
+sims_base +
+  geom_segment(aes(xend = index, yend = 1 / theta,
+                   color = value < (1 / theta))) +
+  geom_point(aes(color = value < 1 / theta), size = 2) +
+  scale_colour_viridis_d(
+    name = "", labels = c("Above mean", "Below mean"),
+  )
+```
+
+
+```{r color-ex-setup}
+set.seed(123)
+N <- 101
+theta <- 1/4
+sims <- data.frame(
+  index = seq_len(N),
+  value = sort(rgeom(N, theta) + 1)
+)
+# Here, I am using a data frame inside ggplot()
+sims_base <- ggplot(sims, aes(x = index, y = value)) +
+  theme_classic() +
+  labs(x = "Cumulative count", y = "Simulated value") +
+  scale_x_continuous(breaks = c(1, 26, 51, 76, 101)) +
+  scale_y_continuous(
+    breaks = c(range(sims$value), median(sims$value), 1 / theta)
+  )
+```
+
+
+In the code chunk below, the `sims` and `sims_base` objects are available. A points at 
+coordinates `(index, value)` with `shape = 21`. The shape allows your to
+control `fill` for the filling colour and `colour` for the edge colour separately.
+Set `fill` based on `value < sims$value[51]` using ColorBrewer palette _Dark2_.
+
+
+```{r color-ex, exercise=TRUE, exercise.lines=10}
+sims_base
+```
+
+```{r color-ex-solution}
+sims_base +
+  geom_point(aes(fill = value < sims$value[51]), shape = 21) +
+  scale_fill_brewer(palette = "Dark2", name = "", 
+                      labels = c("Above sample median", "Below sample median"))
+```
+
+
+## The law of large numbers
+
+For each of the distributions below, complete the following steps to investigate
+the effect of the law of large numbers on their sample means.
+
+1. Simulate $1\ 000$ random samples, $X_i$ for $i=1,2,\ldots,1\ 000$.
+2. Compute sample means for the first $n$ samples for $n=1,2,\ldots,1\ 000$. That is,
+$$\overline{X}_n=\frac{1}{n}\sum_{i=1}^n X_i$$
+3. Plot the sample means in order as points using different colours
+for those within $1/2$ of the population standard deviation from the mean. Use colours of your choice.
+
+### Normal Distribution
+
+$$N(0,1)$$
+
+```{r normal-lln, exercise=TRUE, exercise.lines=15}
+N <- 1000
+x <- rnorm(N)
+sims <- numeric(N)
+for (n in seq_len(N)) {
+  sims[n] <- sum(x[1:n]) / n
+}
+```
+
+```{r normal-lln-solution}
+N <- 1000
+x <- rnorm(N)
+sims <- numeric(N)
+for (n in seq_len(N)) {
+  sims[n] <- sum(x[1:n]) / n
+}
+ggplot() +
+  theme_classic() +
+  geom_point(aes(x = seq_len(N), y = sims, colour = abs(sims) < 1 / 2)) +
+  scale_colour_manual(values = c(`FALSE` = "navy", `TRUE` = "pink"),
+                      labels = c("NO", "YES"),
+                      name = "Within 1SD from mean")
+```
+
+
+### Exponential distribution
+
+$$\text{Exp}(1)$$
+
+
+```{r exp-lln, exercise=TRUE, exercise.lines=15}
+N <- 1000
+
+```
+
+```{r exp-lln-solution}
+N <- 1000
+x <- rexp(N)
+sims <- numeric(N)
+for (n in seq_len(N)) {
+  sims[n] <- sum(x[1:n]) / n
+}
+ggplot() +
+  theme_classic() +
+  geom_point(aes(x = seq_len(N), y = sims, colour = abs(sims - 1) < 1 / 2)) +
+  scale_colour_manual(values = c(`FALSE` = "navy", `TRUE` = "pink"),
+                      labels = c("NO", "YES"),
+                      name = "Within 1SD from mean")
+```
+
+
+### Poisson distribution
+
+$$\text{Pois}(1)$$
+
+
+```{r pois-lln, exercise=TRUE, exercise.lines=15}
+N <- 1000
+
+```
+
+```{r pois-lln-solution}
+N <- 1000
+x <- rpois(N, 1)
+sims <- numeric(N)
+for (n in seq_len(N)) {
+  sims[n] <- sum(x[1:n]) / n
+}
+ggplot() +
+  theme_classic() +
+  geom_point(aes(x = seq_len(N), y = sims, colour = abs(sims - 1) < 1 / 2)) +
+  scale_colour_manual(values = c(`FALSE` = "navy", `TRUE` = "pink"),
+                      labels = c("NO", "YES"),
+                      name = "Within 1SD from mean")
+```
+
+### Binomial Distribution
+
+$$\text{Binom}\left(10, 1/10\right)$$
+
+```{r binom-lln, exercise=TRUE, exercise.lines=15}
+N <- 1000
+
+```
+
+```{r binom-lln-solution}
+N <- 1000
+x <- rbinom(N, 10, 1 / 10)
+sims <- numeric(N)
+for (n in seq_len(N)) {
+  sims[n] <- sum(x[1:n]) / n
+}
+ggplot() +
+  theme_classic() +
+  geom_point(aes(x = seq_len(N), y = sims, colour = abs(sims - 1) < 1 / 2)) +
+  scale_colour_manual(values = c(`FALSE` = "navy", `TRUE` = "pink"),
+                      labels = c("NO", "YES"),
+                      name = "Within 1SD from mean")
+```
