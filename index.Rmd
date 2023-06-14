@@ -81,7 +81,7 @@ sims_base +
   geom_segment(aes(xend = index, yend = 1 / theta,
                    color = value < (1 / theta))) +
   geom_point(aes(color = value < 1 / theta), size = 2) +
-  scale_colour_discrete(name = "", labels = c("Above mean", "Below mean"))
+  scale_colour_discrete(name = "", labels = c("Not below mean", "Below mean"))
 ```
 
 > We used `scale_colour_discrete()` because the mapped data is of type logical and
@@ -104,7 +104,7 @@ sims_base +
   scale_colour_manual(
     # map colours to values
     values = c(`TRUE` = "orange", `FALSE` = "grey"),
-    name = "", labels = c("Above mean", "Below mean"),
+    name = "", labels = c("Not below mean", "Below mean"),
   )
 ```
 
@@ -120,7 +120,7 @@ sims_base +
   geom_point(aes(color = value < 1 / theta), size = 2) +
   scale_colour_brewer(
     type = "div", # select a diverging colour scheme
-    name = "", labels = c("Above mean", "Below mean"),
+    name = "", labels = c("Not below mean", "Below mean"),
   )
 ```
 
@@ -131,7 +131,7 @@ sims_base +
   geom_point(aes(color = value < 1 / theta), size = 2) +
   scale_colour_brewer(
     palette = "Pastel1", # select a diverging colour scheme
-    name = "", labels = c("Above mean", "Below mean"),
+    name = "", labels = c("Not below mean", "Below mean"),
   )
 ```
 
@@ -144,7 +144,7 @@ sims_base +
                    color = value < (1 / theta))) +
   geom_point(aes(color = value < 1 / theta), size = 2) +
   scale_colour_viridis_d(
-    name = "", labels = c("Above mean", "Below mean"),
+    name = "", labels = c("Not below mean", "Below mean"),
   )
 ```
 
@@ -182,7 +182,7 @@ sims_base
 sims_base +
   geom_point(aes(fill = value < sims$value[51]), shape = 21) +
   scale_fill_brewer(palette = "Dark2", name = "", 
-                      labels = c("Above sample median", "Below sample median"))
+                      labels = c("Not below sample median", "Below sample median"))
 ```
 
 
@@ -221,8 +221,8 @@ ggplot() +
   theme_classic() +
   geom_point(aes(x = seq_len(N), y = sims, colour = abs(sims) < 1 / 2)) +
   scale_colour_manual(values = c(`FALSE` = "navy", `TRUE` = "pink"),
-                      labels = c("NO", "YES"),
-                      name = "Within 1SD from mean")
+                      labels = c(`FALSE` = "NO", `TRUE` = "YES"),
+                      name = "Within half SD from mean")
 ```
 
 
@@ -247,8 +247,8 @@ ggplot() +
   theme_classic() +
   geom_point(aes(x = seq_len(N), y = sims, colour = abs(sims - 1) < 1 / 2)) +
   scale_colour_manual(values = c(`FALSE` = "navy", `TRUE` = "pink"),
-                      labels = c("NO", "YES"),
-                      name = "Within 1SD from mean")
+                      labels = c(`FALSE` = "NO", `TRUE` = "YES"),
+                      name = "Within half SD from mean")
 ```
 
 
@@ -273,8 +273,8 @@ ggplot() +
   theme_classic() +
   geom_point(aes(x = seq_len(N), y = sims, colour = abs(sims - 1) < 1 / 2)) +
   scale_colour_manual(values = c(`FALSE` = "navy", `TRUE` = "pink"),
-                      labels = c("NO", "YES"),
-                      name = "Within 1SD from mean")
+                      labels = c(`FALSE` = "NO", `TRUE` = "YES"),
+                      name = "Within half SD from mean")
 ```
 
 ### Binomial Distribution
@@ -295,8 +295,9 @@ for (n in seq_len(N)) {
 }
 ggplot() +
   theme_classic() +
-  geom_point(aes(x = seq_len(N), y = sims, colour = abs(sims - 1) < 1 / 2)) +
+  geom_point(aes(x = seq_len(N), y = sims, 
+                 colour = abs(sims - 1) < sqrt(9 / 10) / 2)) +
   scale_colour_manual(values = c(`FALSE` = "navy", `TRUE` = "pink"),
-                      labels = c("NO", "YES"),
-                      name = "Within 1SD from mean")
+                      labels = c(`FALSE` = "NO", `TRUE` = "YES"),
+                      name = "Within half SD from mean")
 ```
